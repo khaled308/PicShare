@@ -7,6 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import yaml from "yamljs";
 import { PORT } from "./utils/constants.js";
 import imageRoutes from "./routes/image.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import DBConnection from "./utils/db.js";
 
 export const __filename = fileURLToPath(import.meta.url);
@@ -20,6 +21,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/images", imageRoutes);
+app.use("/api/auth", authRoutes);
 
 const swaggerDocument = yaml.load(path.join(__dirname, "../swagger.yaml"));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
