@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-import { registerService } from "../features/auth/authSlice";
+import { registerService, reset } from "../features/auth/authSlice";
 
 const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -37,9 +37,10 @@ const Register = () => {
     }
 
     if (user && success) {
+      dispatch(reset());
       navigate("/login");
     }
-  }, [user, error, success, navigate]);
+  }, [user, error, success, navigate, dispatch]);
 
   return (
     <section className="py-16 xl:pb-56 bg-white overflow-hidden">

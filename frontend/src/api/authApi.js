@@ -16,6 +16,16 @@ export const loginApi = async (data) => {
     const response = await axios.post(`${BASE_URL}/login`, data);
     return response.data;
   } catch (error) {
+    throw (error.response && error.response.data) || error;
+  }
+};
+
+export const verifyEmail = async (token) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/verify-email/${token}`);
+    return response.data;
+  } catch (error) {
     console.log(error);
+    throw (error.response && error.response.data) || error;
   }
 };

@@ -60,5 +60,17 @@ UserSchema.pre("save", function (next) {
   next();
 });
 
+UserSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+UserSchema.methods.generateVerificationToken = function () {
+  const token = crypto.randomBytes(32).toString("hex");
+  this.verificationToken = {
+    token,
+    expires: Date.now() + 3600000, // 1 hour
+  };
+};
+
 const User = mongoose.model("User", UserSchema);
 export default User;

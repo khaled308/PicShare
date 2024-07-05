@@ -17,7 +17,6 @@ export const registerService = createAsyncThunk(
     } catch (err) {
       const message =
         err.errors?.map((error) => error.message).join(", ") || err.message;
-      console.log(message);
       return thunkAPI.rejectWithValue(message);
     }
   }
@@ -31,7 +30,7 @@ export const loginService = createAsyncThunk(
       localStorage.setItem("token", response.data.token);
       return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
@@ -39,6 +38,14 @@ export const loginService = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState,
+  reducers: {
+    reset(state) {
+      state.loading = false;
+      state.error = null;
+      state.success = false;
+      state.user = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerService.pending, (state) => {
@@ -69,5 +76,7 @@ const authSlice = createSlice({
       });
   },
 });
+
+export const { reset } = authSlice.actions;
 
 export default authSlice.reducer;

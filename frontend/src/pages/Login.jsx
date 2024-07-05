@@ -1,17 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginService } from "../features/auth/authSlice";
+import toast from "react-hot-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  password: z.string(),
 });
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user, error, loading, success } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -19,8 +25,19 @@ const Login = () => {
   } = useForm({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = (data) => {
-    console.log(data);
+    dispatch(loginService(data));
   };
+
+  useEffect(() => {
+    if (user && success) {
+      navigate("/");
+    }
+
+    if (error) {
+      toast.error(error);
+    }
+  }, [user, error, navigate, success]);
+
   return (
     <section className="py-16 xl:pb-56 bg-white overflow-hidden">
       <div className="container mx-auto">
@@ -70,8 +87,9 @@ const Login = () => {
             <button
               className="mb-8 py-4 px-9 w-full text-white font-semibold border border-indigo-700 rounded-xl shadow-4xl focus:ring focus:ring-indigo-300 bg-indigo-600 hover:bg-indigo-700 transition ease-in-out duration-200"
               type="submit"
+              disabled={loading}
             >
-              Login
+              {loading ? "Loading..." : "Login"}
             </button>
 
             <div>
