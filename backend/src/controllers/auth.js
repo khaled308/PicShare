@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import axios from "axios";
 import { JWT_SECRET } from "../utils/constants.js";
 import User from "../models/User.js";
 import { sendVerificationEmail } from "../utils/email.js";
@@ -77,5 +78,48 @@ export const login = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const googleLogin = async (req, res) => {
+  const { token } = req.body;
+  try {
+    const { data } = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const { sub: googleId, email, name } = data;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        googleId,
+        email,
+        username: name,
+        isVerified,
+      });
+    }
+
+    if (user && !user.googleId) {
+      user.googleId = googleId;
+      user.isVerified = true;
+      await user.save();
+    }
+
+    const jwtToken = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    const { password: _, ...others } = user._doc;
+    res.status(200).json({
+      message: "Login successful",
+      data: { ...others, token: jwtToken },
+    });
+  } catch (error) {
+    res.status(400).json({ message: "invalid token" });
   }
 };

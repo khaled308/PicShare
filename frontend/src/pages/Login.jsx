@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginService } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
+import GoogleLogin from "../components/GoogleLogin";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -46,6 +47,7 @@ const Login = () => {
             Login to your account
           </h2>
           <form onSubmit={handleSubmit(onSubmit)}>
+            <GoogleLogin />
             <label className="block mb-5">
               <input
                 className="px-4 py-3.5 w-full text-gray-500 font-medium placeholder-gray-500 bg-white outline-none border border-gray-300 rounded-lg focus:ring focus:ring-indigo-300"

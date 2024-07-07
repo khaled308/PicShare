@@ -4,6 +4,9 @@ import bcrypt from "bcrypt";
 
 const UserSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String,
+    },
     username: {
       type: String,
     },

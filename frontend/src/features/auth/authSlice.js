@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { registerApi, loginApi } from "../../api/authApi";
+import { registerApi, loginApi, googleLogin } from "../../api/authApi";
 
 const initialState = {
   user: null,
@@ -16,7 +16,7 @@ export const registerService = createAsyncThunk(
       return response;
     } catch (err) {
       const message =
-        err.errors?.map((error) => error.message).join(", ") || err.message;
+        err?.errors?.map((error) => error.message).join(", ") || err.message;
       return thunkAPI.rejectWithValue(message);
     }
   }
@@ -28,6 +28,20 @@ export const loginService = createAsyncThunk(
     try {
       const response = await loginApi(data);
       localStorage.setItem("token", response.data.token);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const googleLoginService = createAsyncThunk(
+  "auth/googleLogin",
+  async (data, thunkAPI) => {
+    try {
+      const response = await googleLogin(data);
+      localStorage.setItem("token", response.data.token);
+      console.log(response.data);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -71,6 +85,19 @@ const authSlice = createSlice({
         state.success = true;
       })
       .addCase(loginService.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(googleLoginService.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(googleLoginService.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.success = true;
+      })
+      .addCase(googleLoginService.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

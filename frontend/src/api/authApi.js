@@ -29,3 +29,12 @@ export const verifyEmail = async (token) => {
     throw (error.response && error.response.data) || error;
   }
 };
+
+export const googleLogin = async (token) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/google-login`, token);
+    return response.data;
+  } catch (error) {
+    throw (error.response && error.response.data) || error;
+  }
+};
